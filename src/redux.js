@@ -14,11 +14,11 @@ const timerReducer = (state = initialState, action) => {
     switch (action.type) {
         case ADD_TIMER:
             return {
-                ...state, timers: [...state.timers, ...action.timer]
+                ...state, timers: [...state.timers, action.timer]
             }
         case REMOVE_TIMER:
             return {
-                ...state, timers: state.timers.filter(timer => timer.id !== action.timer.id)
+                ...state, timers: state.timers.filter(timer => timer.id !== action.id)
             }
         case SET_TIMER_STATUS:
             return {
@@ -48,7 +48,7 @@ const timerReducer = (state = initialState, action) => {
 }
 
 export const addTimer = (timer) => ({type: ADD_TIMER, timer})
-export const removeTimer = (id) => ({type: ADD_TIMER, id})
+export const removeTimer = (id) => ({type: REMOVE_TIMER, id})
 export const setTimerStatus = (id, isRunning) => ({type: SET_TIMER_STATUS, id, isRunning})
 export const updateTimerValue = (id, value) =>({type: UPDATE_TIMER_VALUE, value})
 
