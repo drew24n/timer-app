@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import styles from './App.module.scss';
 import {useDispatch, useSelector} from "react-redux";
-import {addTimer, removeTimer} from "./redux";
+import {addTimer, removeTimer, setIntervalId, startStopTimer, updateTimerValue} from "./redux";
 import moment from "moment";
 
 export default function App() {
@@ -14,6 +14,7 @@ export default function App() {
         e.preventDefault()
         dispatch(addTimer({
             id: moment.now(),
+            intervalId: null,
             name: name,
             value: 0,
             isRunning: false
@@ -21,9 +22,21 @@ export default function App() {
         setName('')
     }
 
-    const deleteTimerHandler = (e, id) => {
-        e.preventDefault()
+    const deleteTimerHandler = (id) => {
         dispatch(removeTimer(id))
+    }
+
+    const switchTimer = (id) => {
+        const currentTimer = state.timers.find(timer => timer.id === id)
+
+        if (!currentTimer.isRunning) {
+            dispatch(startStopTimer(id, true))
+            const intervalId = setInterval(() => dispatch(updateTimerValue(id, 1000)), 1000)
+            dispatch(setIntervalId(id, intervalId))
+        } else {
+            dispatch(startStopTimer(id, false))
+            clearInterval(currentTimer.intervalId)
+        }
     }
 
     return (
@@ -31,14 +44,16 @@ export default function App() {
             <h1>Tracker</h1>
             <form onSubmit={addTimerHandler}>
                 <input value={name} onChange={e => setName(e.target.value)} placeholder={'Enter tracker name'}
-                       type="text"/>
+                       type="text" required={true} autoFocus={true}/>
                 <button>add</button>
             </form>
             {state.timers.map(timer => {
                 return (
                     <span key={timer.id}>
-                        <p>{timer.name} {timer.value}</p>
-                        <button onClick={e => deleteTimerHandler(e, timer.id)}>del</button>
+                        <p>{timer.name} {moment.utc(timer.value).format('HH:mm:ss')}</p>
+                        <button
+                            onClick={() => switchTimer(timer.id)}>{timer.isRunning ? 'stop' : 'run'}</button>
+                        <button onClick={() => deleteTimerHandler(timer.id)}>del</button>
                     </span>
                 )
             })}
