@@ -4,6 +4,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {addTimer, removeTimer, setIntervalId, startStopTimer, updateTimerValue} from "./redux";
 import moment from "moment";
 import "moment-duration-format";
+import pause from './icons/pause_circle_outline-black-18dp.svg';
+import start from './icons/play_arrow-black-18dp.svg';
 
 export default function App() {
     const dispatch = useDispatch()
@@ -50,22 +52,34 @@ export default function App() {
     }
 
     return (
-        <div className={styles.container}>
-            <h1>Tracker</h1>
-            <form onSubmit={addTimerHandler}>
-                <input value={timerName} onChange={e => setTimerName(e.target.value)} placeholder={'Enter tracker name'}
-                       type="text" autoFocus/>
-                <button>add</button>
-            </form>
-            {state.timers.map(timer => {
-                return (
-                    <div key={timer.id}>
-                        <p>{timer.name} {moment.duration(timer.value, 'ms').format('HH:mm:ss', {trim: false})}</p>
-                        <button onClick={() => switchStartStop(timer.id)}>{timer.isRunning ? 'stop' : 'run'}</button>
-                        <button onClick={() => deleteTimerHandler(timer.id)}>del</button>
-                    </div>
-                )
-            }).reverse()}
+        <div className={styles.wrapper}>
+            <div className={styles.content}>
+                <h1>Tracker</h1>
+                <form onSubmit={addTimerHandler}>
+                    <input value={timerName} onChange={e => setTimerName(e.target.value)}
+                           placeholder={'Enter tracker name'} type="text" autoFocus/>
+                    <button/>
+                </form>
+                <div className={styles.timersContainer}>
+                    {state.timers.map(timer => {
+                        return (
+                            <div key={timer.id} className={styles.timer}>
+                                <p className={styles.timerName}>{timer.name}</p>
+                                <nav>
+                                    <p>{moment.duration(timer.value, 'ms').format('HH:mm:ss', {trim: false})}</p>
+                                    <button onClick={() => switchStartStop(timer.id)} className={styles.start_stop_btn}
+                                            style={timer.isRunning
+                                                ? {background: `url(${pause})`}
+                                                : {background: `url(${start})`}
+                                            }>
+                                    </button>
+                                    <button onClick={() => deleteTimerHandler(timer.id)} className={styles.del_btn}/>
+                                </nav>
+                            </div>
+                        )
+                    }).reverse()}
+                </div>
+            </div>
         </div>
     )
 }
