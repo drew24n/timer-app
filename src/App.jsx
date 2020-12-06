@@ -27,7 +27,11 @@ export default function App() {
         startTimer(timerId)
     }
 
-    const deleteTimerHandler = (id) => {
+    const deleteTimerHandler = (id, intervalId) => {
+        const currentTimer = state.timers.find(timer => timer.id === id)
+        if (currentTimer.isRunning) {
+            stopTimer(id, intervalId)
+        }
         dispatch(removeTimer(id))
     }
 
@@ -73,7 +77,8 @@ export default function App() {
                                                 : {background: `url(${start})`}
                                             }>
                                     </button>
-                                    <button onClick={() => deleteTimerHandler(timer.id)} className={styles.del_btn}/>
+                                    <button onClick={() => deleteTimerHandler(timer.id, timer.intervalId)}
+                                            className={styles.del_btn}/>
                                 </nav>
                             </div>
                         )
